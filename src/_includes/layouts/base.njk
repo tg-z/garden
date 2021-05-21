@@ -1,0 +1,69 @@
+{% set highlight_col = ['var(--magenta)', 'var(--cyan)', 'var(--yellow)'] | random %}
+
+{% set kolor = [1, 2, 3 ] | random %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>&#402;disk:
+	{% if altTitle %}{{ altTitle }}
+	{% else %}The {{ page.url | urlToTitle | splitWords | capitalize }}
+	{% endif %}
+	</title>
+	<meta name="description" content="">
+	<meta name="author" content="Fred Bednarski">
+	<meta name="searchmysite-verification" content="le5wbyqi2yKpGLW2B0yal7cPllGi1305d0a57KjCRj">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="{{ "/" | url }}assets/styles.css">
+	<link rel="icon" type="image/png" href="{{ "/" | url }}assets/icons/favicon.png"/>
+	<style>	
+		::-moz-selection { /* Code for Firefox */
+		  background: {{ highlight_col }};
+		  {% if highlight_col != "var(--yellow)" %}
+		  color: var(--bg);
+		  {% endif %}
+		}
+
+		::selection {
+		  background: {{ highlight_col }};
+		  {% if highlight_col != "var(--yellow)" %}
+		  color: var(--bg);
+		  {% endif %}
+		}	
+	</style>
+</head>
+
+<body>
+	<header>
+     <a href="/" class="shadow logo"><img src="{{ "/" | url }}assets/icons/fb_logo.svg" width="40px" class="bg{{kolor}}" /></a>
+      <div class="top-bar shadow">
+		<nav>
+			
+			{% set path = collections.all | naviBreadcrumb(navi.key) %}
+			{% if path.length > 3 %}{% set path = path.slice(-3) %}../{% else %}//{% endif %}{%- for dir in path %}{% set kolor = [1, 2, 3 ] | removeVal(kolor) | random %}<a class="text{{ kolor }}" href="{{ dir.url }}">{{ dir.key }}</a>/{%- endfor %}{{navi.key}}:<span class="blink_me">_</span>
+		</nav>
+      </div>
+    </header>
+
+		
+		{{ content | safe }}
+		{% set kolor = [1, 2, 3 ] | random %}
+		{% set highlight_col = ['var(--magenta)', 'var(--cyan)', 'var(--yellow)'] | random %}
+		
+	<footer>		
+		<section>
+			<div style="float: left; margin-top: -3px; ">
+			Made with <span title="...and a lot of trial and error">&#9825</span> by Fred Bednarski &copy; {{ page.date.getFullYear() }}
+			</div>	
+			<div style="float: right; margin-top: 0px;">
+			<a class="icon" href="http://webring.xxiivv.com/"><img  src="{{ "/" | url }}assets/icons/rotonde.svg" /></a>
+			<a class="icon" rel="me" href=https://merveilles.town/@FredBednarski><img src="{{ "/" | url }}assets/icons/merveilles.svg" /></a>
+			 <link rel="authorization_endpoint" href="https://indieauth.com/auth">
+			</div>
+		</section>
+	</footer>	
+
+</body>
+</html>

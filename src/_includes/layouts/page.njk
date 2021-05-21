@@ -1,0 +1,126 @@
+---
+layout: layouts/base.njk
+---
+
+{% set created = page.inputPath | stat("birthtime") | nchrsDate %}
+{% set updated = page.date | nchrsDate%}
+
+{% set lastDate = [] %}
+{% macro getNewestDate(entry) -%}
+{% set title = entry.key | safe | splitWords | capitalize %}
+{% set smolDate = entry.page.date | nchrsDate %}
+{% set lastDate = lastDate.push(smolDate) %}
+{% if entry.children.length %}
+{% for child in entry.children %}
+{{ getNewestDate(child) }}
+{% endfor -%}
+{%- endif -%}
+{%- endmacro %}
+
+
+{% macro renderMenuItem(item) %}
+	{{ getNewestDate(item) }}
+				
+	{%if item.excerpt %}
+		{% set excerpt = " — " + item.excerpt %}
+	{% endif %}
+	
+	{%if item.keepTogether %}
+	{% set title = item.title | capitalize %}
+	{%- else -%}
+	{% set title = item.title | splitWords | capitalize %}
+	{%- endif -%}
+
+	{%if item.icon %}
+	 {% set icon = item.icon %}
+	{% elif item.children.length %}
+	  {% set icon = "folder" %}
+	{% else %}
+	  {% set icon = "file" %}
+	{% endif %}
+	
+	<a href="{{ item.url }}" ><li class="bg{{kolor}}">
+<img src="{{ "/" | url }}assets/icons/ico_{{ icon }}.png" height="24px" width="24px" />&nbsp;{{ title }}&nbsp;<span>{{ excerpt }} </span>
+<time>{{ lastDate | newestDate }}</time></li></a>
+{%- endmacro %}
+
+{% set kolor =  [1, 2, 3 ] | removeVal(kolor) | random %}
+
+<main class="shadow shadowPlus4">
+	<div style="margin-bottom:1px; margin: -3px 0 2px 10px;"><span style="font-size: 12px;">
+	~ contents of {{ navi.key }}: {% for tag in tags %} {% set kolor =  [1, 2, 3 ] | removeVal(kolor) | random %} {% if tag != "all" %} <span class="bg{{kolor}}"><a href="/category/{{tag}}">[{{tag}}]</a></span> {% endif %} {% endfor %}<a href="#nav" class="nav-arrow text{{kolor}}">&#9660;</a></div>
+	<hr/>
+	{% if navi.cover %}<section><img src="{{ "/" | url }}assets/img/{{navi.cover}}.png" class="cover" {% if navi.pixelize %} style="image-rendering:crisp-edges;image-rendering: pixelated;"{% endif %} /></section>{% endif %}
+	
+	<article>
+		
+		
+		
+		<h1>{% if not hideTitle %}
+		  {% if altTitle %}{{ altTitle }}
+		  {% else %}The {{ page.url | urlToTitle | splitWords | capitalize }}.
+		  {% endif %}
+		  {% if description %} <span>{{ description }}</span>{% endif %}
+		{% endif %}</h1>
+		
+		{% if includeToc %}
+		<h3>> Table of Contents:<span class="blink_me">_</span></h3>
+		{{ content | toc | safe }}
+		{% endif %}
+		
+		{{ content | safe }}
+
+	</article>
+	
+	
+	{% if not tagPage %}
+	{# Navigation starts here #}	
+		
+	{% set listing = collections.all | navi(navi.key)  | reverse %}
+	{% set listingSorted = collections.all | sortByOrder | navi(navi.key)  | reverse %}
+
+
+		
+	<nav id="nav"><ul>
+		<hr/>
+		{% set kolor =  [1, 2, 3 ] | removeVal(kolor) | random %}
+		
+		{% if navi.parent == "ƒdisk"  %}
+			{% set link = "" %}
+		{% else %}
+			{% set link = navi.parent %}
+		{% endif %}
+				
+		{% if navi.key != "ƒdisk" %}
+			<a href="/{{ link }}" ><li class="bg{{kolor}}"><img src="{{ "/" | url }}assets/icons/ico_back.png" />&nbsp;.. /</li></a>	
+		{% endif %}
+				
+		{% if listing.length %}
+			{%- for item in listingSorted %}	
+				{% if item.children.length and not item.icon %}
+					{{ renderMenuItem(item) }}
+				{% endif %}
+			{%- endfor%}
+			
+			{%- for item in listing %}	
+				{% if not item.children.length or item.icon %}
+					{{ renderMenuItem(item) }}
+				{% endif %}
+			{%- endfor%}
+		{% endif %}
+		</ul></nav>
+		{# Navigation ends here here #}{% endif %}
+		
+		
+		{% set kolor =  [1, 2, 3 ] | removeVal(kolor) | random %}
+	<hr/>
+	<div style="margin-bottom:1px; margin-top: -2px; margin-left:10px;"><span style="font-size: 12px;">
+	>> page created on {{ created }}{% if created!=updated %} &Delta; {{ updated }}{% endif %}
+	</span><a href="#" class="nav-arrow text{{kolor}}">&#9650;</a></div>
+</main>
+
+
+
+			
+
+
